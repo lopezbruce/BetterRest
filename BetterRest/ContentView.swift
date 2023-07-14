@@ -21,6 +21,7 @@ struct ContentView: View {
     @State private var sleepAmount = 8.0
     @State private var coffeeAmount = 1
     
+    @State private var RecommendedBedtime = ""
     @State private var alertTitle = ""
     @State private var alertMessage = ""
     @State private var showingAlert = false
@@ -28,26 +29,36 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             Form {
-                VStack(alignment: .leading, spacing: 0) {
+                Section {
                     Text("When do you want to wake up?")
                         .font(.headline)
                     
                     DatePicker("Please enter a time", selection: $wakeUp, displayedComponents: .hourAndMinute)
                         .labelsHidden()
+                        
                 }
                 
-                VStack(alignment: .leading, spacing: 0) {
+                Section {
                     Text("Desired amount of sleep")
                         .font(.headline)
                     
                     Stepper("\(sleepAmount.formatted()) hours", value: $sleepAmount, in: 4...12, step: 0.25)
                 }
-                VStack(alignment: .leading, spacing: 0) {
+                
+                Section {
                     Text("Daily coffe intake")
                         .font(.headline)
                     
-                    Stepper(coffeeAmount == 1 ? "1 cup" : "\(coffeeAmount) cups", value: $coffeeAmount, in: 1...20)
+                    Picker("Number of cups", selection: $coffeeAmount) {
+                        ForEach(1..<21) {
+                            Text($0 == 1 ? "\($0) cup" : "\($0) cups")
+                        }
+                    }
                 }
+//                Section {
+//                    Text("recommended bedtime is: \(RecommendedBedtime)")
+//                        .font(.headline)
+//                }
             }
             .navigationTitle("BetterRest")
             .toolbar {
@@ -76,8 +87,10 @@ struct ContentView: View {
             
             let sleepTime = wakeUp - prediction.actualSleep
             
+            RecommendedBedtime = sleepTime.formatted(date: .omitted, time: .shortened)
+            
             alertTitle = "Your ideal bedtime is..."
-            alertMessage = sleepTime.formatted(date: .omitted, time: .shortened)
+            alertMessage = RecommendedBedtime
             
         } catch {
             
